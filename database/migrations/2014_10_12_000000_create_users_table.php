@@ -18,8 +18,8 @@ return new class() extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->useCurrent();
             $table->string('password');
-            $table->string('profile_image');
-            $table->string('background_image');
+            $table->string('profile_image')->nullable();
+            $table->string('background_image')->nullable();
             $table->string('works_at')->nullable();
             $table->string('went_to')->nullable();
             $table->string('lives_in')->nullable();

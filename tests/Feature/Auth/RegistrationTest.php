@@ -1,27 +1,31 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Tests\Feature\Auth;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
 {
-    private string $route;
+    use RefreshDatabase;
 
-    public function setUp(): void
+    public function test_registration_screen_can_be_rendered(): void
     {
-        parent::setUp();
+        $response = $this->get('/register');
 
-        $this->route = route('api.auth.register');
+        $response->assertStatus(200);
     }
 
-    public function testUserCanRegister(): void
+    public function test_new_users_can_register(): void
     {
-        $response = $this->postJson($this->route);
+        $response = $this->post('/register', [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
 
-        $response->assertNoContent();
         $this->assertAuthenticated();
+        $response->assertRedirect(route('dashboard', absolute: false));
     }
 }
