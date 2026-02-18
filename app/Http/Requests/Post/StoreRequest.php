@@ -20,21 +20,26 @@ class StoreRequest extends FormRequest
         return [
             'content' => [
                 'nullable',
-                'required_without:images',
+                'required_without:file',
                 'string',
                 'min:2',
                 'max:1000',
             ],
 
-            'images' => [
+           
+            'file' => [
                 'nullable',
                 'required_without:content',
+                'file',
                 'array',
+                'max:51200', // 50MB in KB
             ],
 
-            'images.*' => [
+
+            'file.*' => [
                 'required',
-                File::image(),
+                File::types(['mp3', 'wav', 'mp4'])
+                    ->max(12 * 1024),
             ],
         ];
     }

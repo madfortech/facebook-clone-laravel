@@ -19,13 +19,13 @@ class Post extends Model
 
     protected $fillable = [
         'content',
-        'images',
+        'file',
         'author_id',
         'commenting',
     ];
 
     protected $casts = [
-        'images' => 'array',
+        'file' => 'array',
         'commenting' => 'boolean',
     ];
 

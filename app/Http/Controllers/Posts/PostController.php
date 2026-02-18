@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class PostController extends Controller
 {
@@ -33,7 +34,7 @@ class PostController extends Controller
             ->paginate(10, [
                 'id',
                 'content',
-                'images',
+                'file',
                 'author_id',
                 'commenting',
                 'created_at',
@@ -43,12 +44,18 @@ class PostController extends Controller
         return PaginatedResponseFacade::response(PostResource::class, $pagination);
     }
 
+    public function create(): View
+    {
+        return view('posts.create');
+    }
+
     public function store(StoreRequest $request): JsonResponse
     {
+        
         $paths = [];
 
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
+        if ($request->hasFile('file')) {
+            foreach ($request->file('file') as $image) {
                 $path = $image->store('posts', 'public');
 
                 $paths[] = str_replace('public', '', $path);
@@ -57,28 +64,33 @@ class PostController extends Controller
 
         $post = $request->user()->posts()->create([
             'content' => $request->validated('content'),
-            'images' => $paths,
+            'file' => $paths,
         ]);
 
         return (new PostResource($post))
             ->response()
             ->setStatusCode(201);
     }
+    
+    public function edit(Post $post): View
+    {
+        return view('posts.edit', compact('post'));
+    }
 
     public function update(Post $post, UpdateRequest $request): Response
     {
         $data = $request->validated();
 
-        $paths = collect($post->images);
+        $paths = collect($post->file);
 
-        if (isset($data['imagesToDelete'])) {
-            $paths = $paths->diff($data['imagesToDelete']);
+        if (isset($data['fileToDelete'])) {
+            $paths = $paths->diff($data['fileToDelete']);
 
-            Storage::disk('public')->delete($data['imagesToDelete']);
+            Storage::disk('public')->delete($data['fileToDelete']);
         }
 
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
+        if ($request->hasFile('file')) {
+            foreach ($request->file('file') as $image) {
                 $path = $image->store('posts', 'public');
 
                 $paths->push(str_replace('public', '', $path));
@@ -87,7 +99,7 @@ class PostController extends Controller
 
         $post->update([
             'content' => $request->validated('content', $post->content),
-            'images' => $paths,
+            'file' => $paths,
         ]);
 
         return response()->noContent();

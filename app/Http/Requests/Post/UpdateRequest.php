@@ -26,22 +26,22 @@ class UpdateRequest extends FormRequest
                 'max:1000',
             ],
 
-            'images' => [
+            'file' => [
                 'nullable',
                 'array',
             ],
 
-            'images.*' => [
+            'file.*' => [
                 'required',
                 File::image(),
             ],
 
-            'imagesToDelete' => [
+            'fileToDelete' => [
                 'nullable',
                 'array',
             ],
 
-            'imagesToDelete.*' => [
+            'fileToDelete.*' => [
                 'required',
                 'string',
             ],
